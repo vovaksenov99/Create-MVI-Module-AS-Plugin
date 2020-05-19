@@ -34,13 +34,12 @@
 
     <actions>
         <group id="ScreenGenerator.FileMenu"
-               text="Screen"
-               description="Screen Generator Plugin">
+               text="Add new module">
             <add-to-group group-id="NewGroup" anchor="last"/>
             <separator />
             <action id="NewScreenAction"
                     class="ui.newscreen.NewScreenAction"
-                    text="Screen"
+                    text="Add new module"
                     description="Screen Generator Plugin"/>
         </group>
     </actions>

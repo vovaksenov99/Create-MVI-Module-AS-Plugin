@@ -6,10 +6,13 @@ import data.file.SourceRoot
 interface SourceRootRepository {
 
     fun findCodeSourceRoot(module: String): SourceRoot?
+    fun findRootDirectory(module: String): SourceRoot?
     fun findResourcesSourceRoot(module: String): SourceRoot
 }
 
 class SourceRootRepositoryImpl(private val projectStructure: ProjectStructure) : SourceRootRepository {
+
+
 
     override fun findCodeSourceRoot(module: String) =
             projectStructure.findSourceRoots(module).firstOrNull {
@@ -20,6 +23,9 @@ class SourceRootRepositoryImpl(private val projectStructure: ProjectStructure) :
                         && !pathTrimmed.contains("test", true)
                         && !pathTrimmed.contains("res", true)
             }
+
+    override fun findRootDirectory(module: String) =
+            projectStructure.findSourceRoots(module).first()
 
     override fun findResourcesSourceRoot(module: String) =
             projectStructure.findSourceRoots(module).first {
