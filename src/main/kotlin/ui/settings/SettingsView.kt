@@ -27,5 +27,8 @@ interface SettingsView {
     fun showFileNameTemplate(text: String)
     fun showFileNameSample(text: String)
     fun showHelp()
+    fun swapToGradleTemplateListener(addListener: Boolean)
+    fun swapToAndroidManifestTemplateListener(addListener: Boolean)
     fun setScreenElementDetailsEnabled(isEnabled: Boolean)
+    fun setFileNameUnchangeable(text: String = "")
 }

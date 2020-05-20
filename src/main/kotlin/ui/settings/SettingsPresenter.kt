@@ -65,6 +65,7 @@ class SettingsPresenter(private val view: SettingsView,
             updateSampleCode(selectedElement)
             view.addTextChangeListeners()
             view.setScreenElementDetailsEnabled(true)
+            setBaseAndroidFilesFieldPrefs(selectedElement)
         } else {
             currentSelectedScreenElement = null
             view.removeTextChangeListeners()
@@ -166,16 +167,26 @@ class SettingsPresenter(private val view: SettingsView,
         view.showCodeTextFields(screenElement.fileType)
         when (screenElement.fileType) {
             FileType.KOTLIN -> view.swapToKotlinTemplateListener(addListener)
+            FileType.GRADLE -> view.swapToGradleTemplateListener(addListener)
+            FileType.ANDROID_MANIFEST -> view.swapToAndroidManifestTemplateListener(addListener)
             FileType.LAYOUT_XML -> view.swapToXmlTemplateListener(addListener)
         }
         view.showFileNameTemplate(screenElement.fileNameTemplate)
         updateSampleFileName(screenElement)
+        setBaseAndroidFilesFieldPrefs(screenElement)
+    }
+
+    fun setBaseAndroidFilesFieldPrefs(screenElement: ScreenElement) {
+        when (screenElement.fileType) {
+            FileType.GRADLE, FileType.ANDROID_MANIFEST -> view.setFileNameUnchangeable(screenElement.fileType.defaultFileName)
+        }
     }
 
     fun onFileNameChange(fileName: String) {
-        currentSelectedScreenElement?.let {
-            it.fileNameTemplate = fileName
-            updateSampleFileName(it)
+        currentSelectedScreenElement?.let { screenElement ->
+            setBaseAndroidFilesFieldPrefs(screenElement)
+            screenElement.fileNameTemplate = fileName
+            updateSampleFileName(screenElement)
             isModified = true
         }
     }

@@ -145,6 +145,20 @@ class SettingsViewImpl(private val project: Project) : Configurable, SettingsVie
         if (addListener) templateDocumentListener = currentTemplateTextField?.addTextChangeListener(presenter::onTemplateChange)
     }
 
+    override fun swapToGradleTemplateListener(addListener: Boolean) = onPanel {
+        templateDocumentListener?.let { currentTemplateTextField?.document?.removeDocumentListener(it) }
+        currentTemplateTextField = codePanel.gradleTemplateTextField
+        currentSampleTextField = codePanel.gradleSampleTextField
+        if (addListener) templateDocumentListener = currentTemplateTextField?.addTextChangeListener(presenter::onTemplateChange)
+    }
+
+    override fun swapToAndroidManifestTemplateListener(addListener: Boolean) = onPanel {
+        templateDocumentListener?.let { currentTemplateTextField?.document?.removeDocumentListener(it) }
+        currentTemplateTextField = codePanel.androidManifestTemplateTextField
+        currentSampleTextField = codePanel.androidManifestSampleTextField
+        if (addListener) templateDocumentListener = currentTemplateTextField?.addTextChangeListener(presenter::onTemplateChange)
+    }
+
     override fun swapToXmlTemplateListener(addListener: Boolean) = onPanel {
         templateDocumentListener?.let { currentTemplateTextField?.document?.removeDocumentListener(it) }
         currentTemplateTextField = codePanel.xmlTemplateTextField
@@ -163,6 +177,8 @@ class SettingsViewImpl(private val project: Project) : Configurable, SettingsVie
     override fun showHelp() = HelpDialog().show()
 
     override fun setScreenElementDetailsEnabled(isEnabled: Boolean) = onPanel { setScreenElementDetailsEnabled(isEnabled) }
+
+    override fun setFileNameUnchangeable(text: String) = onPanel { setFileNameUnchangeable(text) }
 
     private inline fun onPanel(function: SettingsPanel.() -> Unit) = panel?.run { function() } ?: Unit
 }

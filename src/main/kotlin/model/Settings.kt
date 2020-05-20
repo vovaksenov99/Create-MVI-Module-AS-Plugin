@@ -11,9 +11,11 @@ private fun defaultScreenElements() = mutableListOf(
         ScreenElement("MVP", DEFAULT_MVP_TEMPLATE, FileType.KOTLIN, "${Variable.NAME.value}${Variable.ANDROID_COMPONENT_NAME.value}"),
         ScreenElement("Presenter", FileType.KOTLIN.defaultTemplate, FileType.KOTLIN, FileType.KOTLIN.defaultFileName),
         ScreenElement("View", DEFAULT_VIEW_TEMPLATE, FileType.KOTLIN, FileType.KOTLIN.defaultFileName),
-        ScreenElement("layout", FileType.LAYOUT_XML.defaultTemplate, FileType.LAYOUT_XML, FileType.LAYOUT_XML.defaultFileName)
+        ScreenElement("layout", FileType.LAYOUT_XML.defaultTemplate, FileType.LAYOUT_XML, FileType.LAYOUT_XML.defaultFileName),
+        ScreenElement("gradle", FileType.GRADLE.defaultTemplate, FileType.GRADLE, FileType.GRADLE.defaultFileName),
+        ScreenElement("android manifest", FileType.ANDROID_MANIFEST.defaultTemplate, FileType.ANDROID_MANIFEST, FileType.ANDROID_MANIFEST.defaultFileName)
 )
 
 data class Settings(var screenElements: MutableList<ScreenElement> = defaultScreenElements(),
-               var activityBaseClass: String = DEFAULT_BASE_ACTIVITY_CLASS,
-               var fragmentBaseClass: String = DEFAULT_BASE_FRAGMENT_CLASS) : Serializable
+                    var activityBaseClass: String = DEFAULT_BASE_ACTIVITY_CLASS,
+                    var fragmentBaseClass: String = DEFAULT_BASE_FRAGMENT_CLASS) : Serializable

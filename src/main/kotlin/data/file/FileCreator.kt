@@ -1,83 +1,62 @@
 package data.file
 
 import data.repository.SettingsRepository
-import data.repository.SourceRootRepository
 import model.AndroidComponent
 import model.FileType
 import model.Settings
-import ui.newscreen.NewScreenDialog
-import java.io.IOException
-import java.io.PrintWriter
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.nio.file.StandardOpenOption
 
 
-private const val LAYOUT_DIRECTORY = "layout"
-
 interface FileCreator {
 
     fun createScreenFiles(packageName: String, screenName: String, androidComponent: AndroidComponent, moduleName: String, rootDirectory: String)
+    fun createFile(path: String, name: String, fileContent: String)
 }
 
-class FileCreatorImpl(private val settingsRepository: SettingsRepository,
-                      private val sourceRootRepository: SourceRootRepository) : FileCreator {
+class FileCreatorImpl(private val settingsRepository: SettingsRepository) : FileCreator {
+
+    private var createdModuleDirs = mapOf<String, String>()
 
     override fun createScreenFiles(packageName: String, screenName: String, androidComponent: AndroidComponent, moduleName: String, rootDirectory: String) {
-        java.io.File("$rootDirectory/$moduleName").mkdir()
-        java.io.File("$rootDirectory/$moduleName/src").mkdir()
-        java.io.File("$rootDirectory/$moduleName/src/main").mkdir()
-        java.io.File("$rootDirectory/$moduleName/src/main/kotlin").mkdir()
-        java.io.File("$rootDirectory/$moduleName/src/main/kotlin/$packageName").mkdir()
-        java.io.File("$rootDirectory/$moduleName/src/main/res").mkdir()
-        java.io.File("$rootDirectory/$moduleName/src/main/res/layout").mkdir()
-        java.io.File("$rootDirectory/$moduleName/build.gradle").createNewFile()
-            settingsRepository.loadSettings().apply {
-                val baseClass = getAndroidComponentBaseClass(androidComponent)
-                screenElements.forEach {
-                    if (it.fileType == FileType.LAYOUT_XML) {
-                        val file = File(it.fileName(screenName, packageName, androidComponent.displayName, baseClass), it.body(screenName, packageName, androidComponent.displayName, baseClass), it.fileType)
-                        java.io.File("$rootDirectory/$moduleName/src/${file.name}.xml").createNewFile()
-                        val writer = PrintWriter("$rootDirectory/$moduleName/src/${file.name}.xml", "UTF-8")
-                        writer.println(file.content)
-                        writer.close()
-                    } else {
-                        val file = File(it.fileName(screenName, packageName, androidComponent.displayName, baseClass), it.body(screenName, packageName, androidComponent.displayName, baseClass), it.fileType)
-                        java.io.File("$rootDirectory/$moduleName/src/${file.name}.kt").createNewFile()
-                        val writer = PrintWriter("$rootDirectory/$moduleName/src/${file.name}.kt", "UTF-8")
-                        writer.println(file.content)
-                        writer.close()
-                    }
+        createModuleFolders(rootDirectory, moduleName, packageName)
+        settingsRepository.loadSettings().apply {
+            val baseClass = getAndroidComponentBaseClass(androidComponent)
+            screenElements.forEach {
+                val file = File(it.fileName(screenName, packageName, androidComponent.displayName, baseClass), it.body(screenName, packageName, androidComponent.displayName, baseClass), it.fileType)
+                val fileDir = when (it.fileType) {
+                    FileType.KOTLIN -> createdModuleDirs["package"]
+                    FileType.LAYOUT_XML -> createdModuleDirs["layout"]
+                    FileType.GRADLE -> createdModuleDirs["module"]
+                    FileType.ANDROID_MANIFEST -> createdModuleDirs["main"]
                 }
+                createFile(fileDir ?: throw IllegalStateException("Path for ${it.name} doesn't exist"), file)
             }
-
-        try {
-            Files.write(Paths.get("$rootDirectory/settings.gradle"), "\ninclude ':$moduleName'".toByteArray(), StandardOpenOption.APPEND)
-        } catch (e: IOException) {
-            //exception handling left as an exercise for the reader
         }
-
+        Files.write(Paths.get("$rootDirectory/settings.gradle"), "\ninclude ':$moduleName'".toByteArray(), StandardOpenOption.APPEND)
     }
 
-    private fun findCodeSubdirectory(packageName: String, module: String): Directory? = sourceRootRepository.findCodeSourceRoot(module)?.run {
-        var subdirectory = directory
-        packageName.split(".").forEach {
-            subdirectory = subdirectory.findSubdirectory(it) ?: subdirectory.createSubdirectory(it)
-        }
-        return subdirectory
+    override fun createFile(path: String, name: String, fileContent: String) {
+        val filePath = "$path/${name}"
+        Files.write(Paths.get(filePath), fileContent.toByteArray(), StandardOpenOption.CREATE_NEW)
     }
 
-    private fun getRootDirectory(packageName: String, module: String): Directory? =
-            sourceRootRepository.findRootDirectory(module)?.run {
-                var subdirectory = directory
-                packageName.split(".").forEach {
-                    subdirectory = subdirectory.findSubdirectory(it) ?: subdirectory.createSubdirectory(it)
-                }
-                return subdirectory
-            }
+    private fun createFile(path: String, file: File) {
+        createFile(path, "${file.name}.${file.fileType.extension}", file.content)
+    }
 
-    private fun findResourcesSubdirectory(module: String) = sourceRootRepository.findResourcesSourceRoot(module).directory.run {
-        findSubdirectory(LAYOUT_DIRECTORY) ?: createSubdirectory(LAYOUT_DIRECTORY)
+    private fun createModuleFolders(rootDirectory: String, moduleName: String, packageName: String) {
+        createdModuleDirs = mapOf(
+                "module" to "$rootDirectory/$moduleName",
+                "src" to "$rootDirectory/$moduleName/src",
+                "main" to "$rootDirectory/$moduleName/src/main",
+                "kotlin" to "$rootDirectory/$moduleName/src/main/kotlin",
+                "package" to "$rootDirectory/$moduleName/src/main/kotlin/$packageName",
+                "res" to "$rootDirectory/$moduleName/src/main/res",
+                "layout" to "$rootDirectory/$moduleName/src/main/res/layout"
+        )
+        createdModuleDirs.forEach { java.io.File(it.value).mkdir() }
     }
 
     private fun Settings.getAndroidComponentBaseClass(androidComponent: AndroidComponent) = when (androidComponent) {
