@@ -1,29 +1,31 @@
 package ui.newscreen
 
-import data.file.CurrentPath
 import data.file.FileCreator
-import data.file.PackageExtractor
 import data.file.WriteActionDispatcher
-import data.repository.ModuleRepository
 import model.AndroidComponent
+import java.util.*
 
-class NewScreenPresenter(private val view: NewScreenView,
-                         private val fileCreator: FileCreator,
-                         private val packageExtractor: PackageExtractor,
-                         private val writeActionDispatcher: WriteActionDispatcher,
-                         private val moduleRepository: ModuleRepository,
-                         private val currentPath: CurrentPath?) {
+class NewScreenPresenter(
+        private val view: NewScreenView,
+        private val fileCreator: FileCreator,
+        private val writeActionDispatcher: WriteActionDispatcher
+) {
 
-    fun onLoadView() {
-        view.showPackage(packageExtractor.extractFromCurrentPath())
-        view.showModules(moduleRepository.getAllModules())
-        currentPath?.let { view.selectModule(currentPath.module) }
+    companion object {
+
+        const val DELAY_GRADLE_SYNC = 2000L
+
     }
 
-    fun onOkClick(packageName: String, screenName: String, androidComponent: AndroidComponent, module: String) {
+    fun onLoadView() {
+        view.showPackage("com.touchin.sample")
+    }
+
+    fun onOkClick(packageName: String, screenName: String, androidComponent: AndroidComponent, moduleName: String, rootDirectory: String) {
         writeActionDispatcher.dispatch {
-            fileCreator.createScreenFiles(packageName, screenName, androidComponent, module)
+            fileCreator.createScreenFiles(packageName, screenName, androidComponent, moduleName, rootDirectory)
         }
         view.close()
     }
+
 }

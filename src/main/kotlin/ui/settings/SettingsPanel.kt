@@ -35,7 +35,7 @@ class SettingsPanel(project: Project) : JPanel() {
     val codePanel = CodePanel(project)
 
     private lateinit var screenElementDetailsPanel: JPanel
-    private val screenElementNameLabel = JLabel("Screen Element Name:")
+    private val screenElementNameLabel = JLabel("Element Name:")
     private val fileNameLabel = JLabel("File Name:")
     private val fileTypeLabel = JLabel("File Type:")
 
@@ -55,7 +55,7 @@ class SettingsPanel(project: Project) : JPanel() {
     }
 
     private fun createScreenElementsPanel() = JPanel().apply {
-        border = IdeBorderFactory.createTitledBorder("Screen Elements", false)
+        border = IdeBorderFactory.createTitledBorder("Elements", false)
         layout = GridLayout(1, 1)
         add(toolbarDecorator.createPanel())
     }
@@ -70,7 +70,7 @@ class SettingsPanel(project: Project) : JPanel() {
     }
 
     private fun createScreenElementDetailsPanel() = JPanel().apply {
-        border = IdeBorderFactory.createTitledBorder("Screen Element Details", false)
+        border = IdeBorderFactory.createTitledBorder("Element Details", false)
         layout = GridBagLayout()
         add(screenElementNameLabel, constraintsLeft(0, 0))
         add(nameTextField, constraintsRight(1, 0))
@@ -122,6 +122,12 @@ class SettingsPanel(project: Project) : JPanel() {
     private fun addCodePanel(onHelpClick: () -> Unit) {
         codePanel.create(onHelpClick)
         add(codePanel, BorderLayout.CENTER)
+    }
+
+    fun setFileNameUnchangeable(text: String = "") {
+        nameTextField.text = text
+        nameTextField.isEnabled = false
+        fileNameTextField.isEnabled = false
     }
 
     fun setScreenElementDetailsEnabled(isEnabled: Boolean) {

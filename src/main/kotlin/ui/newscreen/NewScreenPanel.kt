@@ -13,14 +13,14 @@ class NewScreenPanel : JPanel() {
 
     val nameTextField = JTextField()
     val packageTextField = JTextField()
+    val moduleTextField = JTextField()
 
     val androidComponentComboBox = ComboBox<AndroidComponent>(AndroidComponent.values())
-    val moduleComboBox = ComboBox<String>()
 
     init {
         layout = GridLayout(0, 2)
-        add(JLabel("Module:"))
-        add(moduleComboBox)
+        add(JLabel("Module name:"))
+        add(moduleTextField)
         add(JLabel("Package:"))
         add(packageTextField)
         add(JLabel("Name:"))

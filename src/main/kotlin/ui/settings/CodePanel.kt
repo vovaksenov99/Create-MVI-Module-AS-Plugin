@@ -20,10 +20,16 @@ class CodePanel(private val project: Project) : JPanel() {
     val kotlinSampleTextField = createLanguageTextField(KotlinLanguage.INSTANCE, isEnabled = false)
     val xmlTemplateTextField = createLanguageTextField(XMLLanguage.INSTANCE, isVisible = false)
     val xmlSampleTextField = createLanguageTextField(XMLLanguage.INSTANCE, isVisible = false, isEnabled = false)
+    val gradleTemplateTextField = createLanguageTextField(KotlinLanguage.INSTANCE, isVisible = false)
+    val gradleSampleTextField = createLanguageTextField(KotlinLanguage.INSTANCE, isVisible = false, isEnabled = false)
+    val androidManifestTemplateTextField = createLanguageTextField(XMLLanguage.INSTANCE, isVisible = false)
+    val androidManifestSampleTextField = createLanguageTextField(XMLLanguage.INSTANCE, isVisible = false, isEnabled = false)
 
     private val textFieldsMap = mapOf(
             FileType.KOTLIN to listOf(kotlinTemplateTextField, kotlinSampleTextField),
-            FileType.LAYOUT_XML to listOf(xmlTemplateTextField, xmlSampleTextField)
+            FileType.LAYOUT_XML to listOf(xmlTemplateTextField, xmlSampleTextField),
+            FileType.GRADLE to listOf(gradleTemplateTextField, gradleSampleTextField),
+            FileType.ANDROID_MANIFEST to listOf(androidManifestTemplateTextField, androidManifestSampleTextField)
     )
     private var currentFileType = FileType.KOTLIN
     private lateinit var templatePanel: JPanel
@@ -46,6 +52,8 @@ class CodePanel(private val project: Project) : JPanel() {
                 layout = BoxLayout(this, Y_AXIS)
                 add(kotlinSampleTextField)
                 add(xmlSampleTextField)
+                add(gradleSampleTextField)
+                add(androidManifestSampleTextField)
                 add(JPanel(FlowLayout(FlowLayout.TRAILING)).apply { add(LinkLabel.create("Help", onHelpClick)) })
             }
 
@@ -55,6 +63,8 @@ class CodePanel(private val project: Project) : JPanel() {
                 layout = BoxLayout(this, Y_AXIS)
                 add(kotlinTemplateTextField)
                 add(xmlTemplateTextField)
+                add(gradleTemplateTextField)
+                add(androidManifestTemplateTextField)
             }
 
     fun show(fileType: FileType) {

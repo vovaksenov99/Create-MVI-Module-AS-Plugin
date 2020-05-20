@@ -1,7 +1,7 @@
 <idea-plugin>
-    <id>pl.gmat.screengenerator</id>
-    <name>Screen Generator</name>
-    <vendor email="grzesiek.matyszczak@gmail.com">Grzegorz Matyszczak</vendor>
+    <id>pl.gmat.modulegenerator</id>
+    <name>Module Generator</name>
+    <vendor email="grzesiek.matyszczak@gmail.com">Aksenov Vladimir (Base from Grzegorz Matyszczak)</vendor>
     <idea-version since-build="182"/>
 
     <description><![CDATA[
@@ -34,14 +34,13 @@
 
     <actions>
         <group id="ScreenGenerator.FileMenu"
-               text="Screen"
-               description="Screen Generator Plugin">
+               text="Add new module">
             <add-to-group group-id="NewGroup" anchor="last"/>
             <separator />
             <action id="NewScreenAction"
                     class="ui.newscreen.NewScreenAction"
-                    text="Screen"
-                    description="Screen Generator Plugin"/>
+                    text="Add new module"
+                    description="Module Generator Plugin"/>
         </group>
     </actions>
 </idea-plugin>

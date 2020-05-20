@@ -36,8 +36,14 @@ compileTestKotlin {
     kotlinOptions.jvmTarget = "1.8"
 }
 intellij {
-    version '2019.2'
-    alternativeIdePath '/Applications/Android Studio.app'
-    plugins 'kotlin'
+    // Define IntelliJ Platform against which to build the plugin project.
+    version '192.7142.36'  // Same IntelliJ IDEA version (2019.1.4) as target 3.5 Android Studio
+    alternativeIdePath 'C:\\Program Files\\Android\\Android Studio'
+    plugins 'kotlin','gradle'
     intellij.updateSinceUntilBuild false
+}
+
+runIde {
+    //ideDirectory 'C:\\Program Files\\Android\\Android Studio\\bin'
+    jvmArgs('-Xmx4096m')
 }
