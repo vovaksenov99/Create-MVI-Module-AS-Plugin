@@ -33,7 +33,7 @@ class SettingsViewImpl(private val project: Project) : Configurable, SettingsVie
 
     override fun isModified() = presenter.isModified
 
-    override fun getDisplayName() = "Screen Generator Plugin"
+    override fun getDisplayName() = "Module Generator Plugin"
 
     override fun apply() = presenter.onApplySettings()
 
