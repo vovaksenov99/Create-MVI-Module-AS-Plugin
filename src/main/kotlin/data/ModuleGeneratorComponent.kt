@@ -11,17 +11,17 @@ import java.io.Serializable
 
 @State(name = "ModuleGeneratorConfiguration",
         storages = [Storage(value = "moduleGeneratorConfiguration.xml")])
-class ScreenGeneratorComponent : Serializable, PersistentStateComponent<ScreenGeneratorComponent> {
+class ModuleGeneratorComponent : Serializable, PersistentStateComponent<ModuleGeneratorComponent> {
 
     companion object {
-        fun getInstance(project: Project) = ServiceManager.getService(project, ScreenGeneratorComponent::class.java)
+        fun getInstance(project: Project) = ServiceManager.getService(project, ModuleGeneratorComponent::class.java)
     }
 
     var settings: Settings = Settings()
 
-    override fun getState(): ScreenGeneratorComponent = this
+    override fun getState(): ModuleGeneratorComponent = this
 
-    override fun loadState(state: ScreenGeneratorComponent) {
+    override fun loadState(state: ModuleGeneratorComponent) {
         XmlSerializerUtil.copyBean(state, this)
     }
 }

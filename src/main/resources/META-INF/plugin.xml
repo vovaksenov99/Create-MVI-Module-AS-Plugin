@@ -1,24 +1,26 @@
 <idea-plugin>
     <id>pl.gmat.modulegenerator</id>
     <name>Module Generator</name>
-    <vendor email="grzesiek.matyszczak@gmail.com">Aksenov Vladimir (Base from Grzegorz Matyszczak)</vendor>
+    <vendor email="akscorp2014@gmail.com">Aksenov Vladimir (Base from Grzegorz Matyszczak)</vendor>
     <idea-version since-build="182"/>
 
     <description><![CDATA[
     This plugin helps you automate your everyday development by generating all necessary files for your project's architecture
-    when you are creating a new screen.<br><br>
+    when you are creating a new module.<br><br>
 
-    For example, you are using MVP architecture and you are creating the Main screen. You can set up the plugin to generate for you:
+    For example, you are using MVI architecture and you are creating the new feature. You can set up the plugin to generate for you:
     <ul>
     <li>MainActivity.kt</li>
     <li>MainView.kt</li>
     <li>MainPresenter.kt</li>
     <li>activity_main.xml</li>
+    <li>gradle.build</li>
+    <li>AndroidManifest.xml</li>
     </ul>
     And you can also set content of each file!<br><br>
+    You can set up preferences in Settings -> Other settings -> Module generator Plugin
 
-    Plugin is fully open-source, you can find it here: <a href="https://github.com/gmatyszczak/screen-generator-plugin">https://github.com/gmatyszczak/screen-generator-plugin</a>.<br>
-    Feel free to open an issue there if you notice any bug or have any feature request.
+    Plugin is fully open-source, you can find it here: <a href="https://github.com/vovaksenov99/Create-MVI-Module-AS-Plugin">repo</a>.<br>
     ]]></description>
 
     <depends>com.intellij.modules.lang</depends>
@@ -29,7 +31,7 @@
         <projectConfigurable
                 instance="ui.settings.SettingsViewImpl">
         </projectConfigurable>
-        <projectService serviceInterface="data.ScreenGeneratorComponent" serviceImplementation="data.ScreenGeneratorComponent"/>
+        <projectService serviceInterface="data.ModuleGeneratorComponent" serviceImplementation="data.ModuleGeneratorComponent"/>
     </extensions>
 
     <actions>
