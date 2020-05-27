@@ -1,6 +1,6 @@
 package ui.settings
 
-import model.FileType
+import model.FileTypeDescription
 import model.ScreenElement
 
 interface SettingsView {
@@ -20,8 +20,8 @@ interface SettingsView {
     fun showFragmentBaseClass(text: String)
     fun addBaseClassTextChangeListeners()
     fun removeBaseClassTextChangeListeners()
-    fun showFileType(fileType: FileType)
-    fun showCodeTextFields(fileType: FileType)
+    fun showFileTypeDescription(fileTypeDescription: FileTypeDescription)
+    fun showCodeTextFields(FileTypeDescription: FileTypeDescription)
     fun swapToKotlinTemplateListener(addListener: Boolean)
     fun swapToXmlTemplateListener(addListener: Boolean)
     fun showFileNameTemplate(text: String)

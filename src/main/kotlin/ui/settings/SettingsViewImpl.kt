@@ -4,8 +4,9 @@ import com.intellij.openapi.options.Configurable
 import com.intellij.openapi.project.Project
 import com.intellij.ui.LanguageTextField
 import data.repository.SettingsRepositoryImpl
-import model.FileType
+import model.FileTypeDescription
 import model.ScreenElement
+import model.getTemplates
 import ui.help.HelpDialog
 import util.addTextChangeListener
 import java.awt.event.ActionListener
@@ -24,7 +25,7 @@ class SettingsViewImpl(private val project: Project) : Configurable, SettingsVie
 
     private val fileTypeActionListener: ActionListener = ActionListener {
         onPanel {
-            presenter.onFileTypeSelect(FileType.values()[fileTypeComboBox.selectedIndex])
+            presenter.onFileTypeSelect(getTemplates()[fileTypeComboBox.selectedIndex])
         }
     }
 
@@ -132,11 +133,11 @@ class SettingsViewImpl(private val project: Project) : Configurable, SettingsVie
         fragmentDocumentListener = null
     }
 
-    override fun showFileType(fileType: FileType) = onPanel {
-        fileTypeComboBox.selectedIndex = fileType.ordinal
+    override fun showFileTypeDescription(fileTypeDescription: FileTypeDescription) = onPanel {
+        fileTypeComboBox.selectedIndex = fileTypeDescription.description.ordinal
     }
 
-    override fun showCodeTextFields(fileType: FileType) = onPanel { codePanel.show(fileType) }
+    override fun showCodeTextFields(fileTypeDescription: FileTypeDescription) = onPanel { codePanel.show(fileTypeDescription) }
 
     override fun swapToKotlinTemplateListener(addListener: Boolean) = onPanel {
         templateDocumentListener?.let { currentTemplateTextField?.document?.removeDocumentListener(it) }

@@ -20,7 +20,7 @@ import java.util.*
 import javax.swing.JComponent
 
 
-class NewScreenDialog(val project: Project) : DialogWrapper(true), NewScreenView {
+class NewScreenDialog(val project: Project, val selectedFolder: String?) : DialogWrapper(true), NewScreenView {
 
     private val panel = NewScreenPanel()
 
@@ -36,10 +36,9 @@ class NewScreenDialog(val project: Project) : DialogWrapper(true), NewScreenView
     override fun doOKAction() {
         presenter.onOkClick(
                 panel.packageTextField.text,
-                panel.nameTextField.text,
+                panel.featureNameTextField.text,
                 AndroidComponent.values()[panel.androidComponentComboBox.selectedIndex],
-                panel.moduleTextField.text,
-                project.basePath ?: "")
+                selectedFolder ?: "")
         Timer("SyncGradle", false).schedule(object : TimerTask() {
             override fun run() {
                 runGradle("build", project.basePath ?: "")
@@ -50,7 +49,7 @@ class NewScreenDialog(val project: Project) : DialogWrapper(true), NewScreenView
 
 
     override fun createCenterPanel(): JComponent {
-        presenter.onLoadView()
+        presenter.onLoadView(project.basePath)
         return panel
     }
 

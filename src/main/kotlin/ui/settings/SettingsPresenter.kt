@@ -1,13 +1,11 @@
 package ui.settings
 
 import data.repository.SettingsRepository
-import model.FileType
-import model.ScreenElement
-import model.Settings
+import model.*
 import util.swap
 
 const val SAMPLE_SCREEN_NAME = "Sample"
-const val SAMPLE_PACKAGE_NAME = "com.sample"
+const val SAMPLE_PACKAGE_NAME = "com.sample.touch"
 const val SAMPLE_ANDROID_COMPONENT = "Activity"
 
 class SettingsPresenter(private val view: SettingsView,
@@ -59,7 +57,7 @@ class SettingsPresenter(private val view: SettingsView,
             currentSelectedScreenElement = selectedElement
             view.removeTextChangeListeners()
             view.showName(selectedElement.name)
-            view.showFileType(selectedElement.fileType)
+            view.showFileTypeDescription(selectedElement.toFileTypeDescription())
             handleFileTypeSelection(selectedElement, false)
             view.showTemplate(selectedElement.template)
             updateSampleCode(selectedElement)
@@ -89,7 +87,7 @@ class SettingsPresenter(private val view: SettingsView,
     }
 
     private fun updateSampleFileName(screenElement: ScreenElement) {
-        val fileName = screenElement.fileName(SAMPLE_SCREEN_NAME, SAMPLE_PACKAGE_NAME, SAMPLE_ANDROID_COMPONENT, currentActivityBaseClass)
+        val fileName = screenElement.name
         val fileExtension = screenElement.fileType.extension
         view.showFileNameSample("$fileName.$fileExtension")
     }
@@ -133,7 +131,7 @@ class SettingsPresenter(private val view: SettingsView,
     }
 
     private fun updateSampleCode(screenElement: ScreenElement) =
-            view.showSampleCode(screenElement.body(SAMPLE_SCREEN_NAME, SAMPLE_PACKAGE_NAME, SAMPLE_ANDROID_COMPONENT, currentActivityBaseClass))
+            view.showSampleCode(screenElement.template)
 
     fun onActivityBaseClassChange(text: String) {
         currentActivityBaseClass = text
@@ -153,10 +151,10 @@ class SettingsPresenter(private val view: SettingsView,
         isModified = true
     }
 
-    fun onFileTypeSelect(fileType: FileType) {
+    fun onFileTypeSelect(fileType: FileTypeDescription) {
         currentSelectedScreenElement?.let {
-            it.fileType = fileType
-            it.fileNameTemplate = fileType.defaultFileName
+            it.fileType = fileType.description
+            it.fileNameTemplate = fileType.displayName
             handleFileTypeSelection(it, true)
             view.showTemplate(fileType.defaultTemplate)
             isModified = true
@@ -164,12 +162,12 @@ class SettingsPresenter(private val view: SettingsView,
     }
 
     private fun handleFileTypeSelection(screenElement: ScreenElement, addListener: Boolean) {
-        view.showCodeTextFields(screenElement.fileType)
+        view.showCodeTextFields(screenElement.toFileTypeDescription())
         when (screenElement.fileType) {
             FileType.KOTLIN -> view.swapToKotlinTemplateListener(addListener)
             FileType.GRADLE -> view.swapToGradleTemplateListener(addListener)
-            FileType.ANDROID_MANIFEST -> view.swapToAndroidManifestTemplateListener(addListener)
-            FileType.LAYOUT_XML -> view.swapToXmlTemplateListener(addListener)
+            FileType.GITIGNORE -> view.swapToAndroidManifestTemplateListener(addListener)
+            FileType.XML -> view.swapToXmlTemplateListener(addListener)
         }
         view.showFileNameTemplate(screenElement.fileNameTemplate)
         updateSampleFileName(screenElement)
@@ -178,7 +176,7 @@ class SettingsPresenter(private val view: SettingsView,
 
     fun setBaseAndroidFilesFieldPrefs(screenElement: ScreenElement) {
         when (screenElement.fileType) {
-            FileType.GRADLE, FileType.ANDROID_MANIFEST -> view.setFileNameUnchangeable(screenElement.fileType.defaultFileName)
+            FileType.GRADLE, FileType.GITIGNORE -> view.setFileNameUnchangeable(screenElement.fileType.name)
         }
     }
 

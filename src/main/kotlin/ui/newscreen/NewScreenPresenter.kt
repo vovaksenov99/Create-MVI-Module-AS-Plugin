@@ -3,7 +3,8 @@ package ui.newscreen
 import data.file.FileCreator
 import data.file.WriteActionDispatcher
 import model.AndroidComponent
-import java.util.*
+import org.jetbrains.kotlin.utils.addToStdlib.firstNotNullResult
+import java.io.File
 
 class NewScreenPresenter(
         private val view: NewScreenView,
@@ -17,13 +18,36 @@ class NewScreenPresenter(
 
     }
 
-    fun onLoadView() {
-        view.showPackage("com.touchin.sample")
+    fun onLoadView(rootDirectory: String?) {
+        view.showPackage(getPackageName(rootDirectory))
     }
 
-    fun onOkClick(packageName: String, screenName: String, androidComponent: AndroidComponent, moduleName: String, rootDirectory: String) {
+    private fun checkPackageName(path: String): String? {
+        var path = path
+        var rez = mutableListOf<String>()
+        if (File(path).exists()) {
+            while (File(path).list()?.size == 1) {
+                val dir = File(path).listFiles()?.firstOrNull() ?: return null
+                path += "/${dir.name}"
+                rez.add(dir.name)
+            }
+            return rez.joinToString(".")
+        }
+        return null
+    }
+
+    fun getPackageName(rootDirectory: String?): String {
+        return listOf(
+                "$rootDirectory/app/src/main/java",
+                "$rootDirectory/app/src/main/kotlin"
+        ).map {
+            checkPackageName(it)
+        }.firstNotNullResult { it } ?: "com.touchin.sample"
+    }
+
+    fun onOkClick(packageName: String, featureName: String, androidComponent: AndroidComponent, rootDirectory: String) {
         writeActionDispatcher.dispatch {
-            fileCreator.createScreenFiles(packageName, screenName, androidComponent, moduleName, rootDirectory)
+            fileCreator.createScreenFiles(packageName, featureName, androidComponent, rootDirectory)
         }
         view.close()
     }

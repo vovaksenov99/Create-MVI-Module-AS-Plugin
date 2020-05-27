@@ -1,25 +1,38 @@
 package model
 
-private val KOTLIN_DEFAULT_TEMPLATE = "package ${Variable.PACKAGE_NAME.value}\n\nclass ${Variable.NAME.value}${Variable.SCREEN_ELEMENT.value}"
-private val GRADLE_DEFAULT_TEMPLATE = ""
-private val ANDROID_MANIFEST_DEFAULT_TEMPLATE = ""
-private const val LAYOUT_XML_DEFAULT_TEMPLATE = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
-        "<FrameLayout xmlns:android=\"http://schemas.android.com/apk/res/android\"\n" +
-        "    android:layout_width=\"match_parent\"\n" +
-        "    android:layout_height=\"match_parent\">\n" +
-        "\n" +
-        "</FrameLayout>"
-private val KOTLIN_DEFAULT_FILE_NAME = "${Variable.NAME.value}${Variable.SCREEN_ELEMENT.value}"
-private val LAYOUT_XML_DEFAULT_FILE_NAME = "${Variable.ANDROID_COMPONENT_NAME_LOWER_CASE.value}_${Variable.NAME_SNAKE_CASE.value}"
-private const val GRADLE_DEFAULT_FILE_NAME = "build"
-private const val ANDROID_MANIFEST_DEFAULT_FILE_NAME = "AndroidManifest"
+import data.file.templates
+import java.io.File
 
+fun getTemplates(): MutableList<FileTypeDescription> {
+    val rez = mutableListOf<FileTypeDescription>()
+    templates.forEach {
+        val file = File(it.name)
+        val extension = file.extension
+        val defaultPath = it.defaultPath
+        val name = file.nameWithoutExtension
+        val content = it.template.trimIndent()
+        val fileType = when (extension) {
+            "kt" -> FileType.KOTLIN
+            "xml" -> FileType.XML
+            "kts" -> FileType.GRADLE
+            "gradle" -> FileType.GRADLE
+            "gitignore" -> FileType.GITIGNORE
+            else -> null
+        }
+        fileType?.let {
+            rez.add(FileTypeDescription(name, fileType, content, name, defaultPath))
+        }
+    }
+    return rez
+}
 
-enum class FileType(val displayName: String, val extension: String, val defaultTemplate: String, val defaultFileName: String) {
-    KOTLIN("Kotlin", "kt", KOTLIN_DEFAULT_TEMPLATE, KOTLIN_DEFAULT_FILE_NAME),
-    LAYOUT_XML("Layout XML", "xml", LAYOUT_XML_DEFAULT_TEMPLATE, LAYOUT_XML_DEFAULT_FILE_NAME),
-    GRADLE("Gradle file", "gradle", GRADLE_DEFAULT_TEMPLATE, GRADLE_DEFAULT_FILE_NAME),
-    ANDROID_MANIFEST("Android manifest file", "xml", ANDROID_MANIFEST_DEFAULT_TEMPLATE, ANDROID_MANIFEST_DEFAULT_FILE_NAME);
+data class FileTypeDescription(var displayName: String, val description: FileType, var defaultTemplate: String, val defaultFileName: String, var defaultPath: String)
+
+enum class FileType(val displayName: String, val extension: String) {
+    KOTLIN("Kotlin", "kt"),
+    XML("XML", "xml"),
+    GRADLE("Gradle file", "kts"),
+    GITIGNORE("Gitignore", "gitignore");
 
     override fun toString() = displayName
 }

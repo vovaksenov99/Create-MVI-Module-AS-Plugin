@@ -11,20 +11,17 @@ import javax.swing.JTextField
 
 class NewScreenPanel : JPanel() {
 
-    val nameTextField = JTextField()
+    val featureNameTextField = JTextField()
     val packageTextField = JTextField()
-    val moduleTextField = JTextField()
 
-    val androidComponentComboBox = ComboBox<AndroidComponent>(AndroidComponent.values())
+    val androidComponentComboBox = ComboBox(AndroidComponent.values())
 
     init {
         layout = GridLayout(0, 2)
-        add(JLabel("Module name:"))
-        add(moduleTextField)
         add(JLabel("Package:"))
         add(packageTextField)
-        add(JLabel("Name:"))
-        add(nameTextField)
+        add(JLabel("Feature name:"))
+        add(featureNameTextField)
         add(JLabel("Android Component:"))
         add(androidComponentComboBox)
     }

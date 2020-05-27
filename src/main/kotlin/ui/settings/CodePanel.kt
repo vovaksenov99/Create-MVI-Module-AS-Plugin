@@ -7,6 +7,7 @@ import com.intellij.ui.IdeBorderFactory
 import com.intellij.ui.LanguageTextField
 import com.intellij.ui.components.labels.LinkLabel
 import model.FileType
+import model.FileTypeDescription
 import org.jetbrains.kotlin.idea.KotlinLanguage
 import java.awt.FlowLayout
 import java.awt.GridLayout
@@ -27,9 +28,9 @@ class CodePanel(private val project: Project) : JPanel() {
 
     private val textFieldsMap = mapOf(
             FileType.KOTLIN to listOf(kotlinTemplateTextField, kotlinSampleTextField),
-            FileType.LAYOUT_XML to listOf(xmlTemplateTextField, xmlSampleTextField),
+            FileType.XML to listOf(xmlTemplateTextField, xmlSampleTextField),
             FileType.GRADLE to listOf(gradleTemplateTextField, gradleSampleTextField),
-            FileType.ANDROID_MANIFEST to listOf(androidManifestTemplateTextField, androidManifestSampleTextField)
+            FileType.GITIGNORE to listOf(androidManifestTemplateTextField, androidManifestSampleTextField)
     )
     private var currentFileType = FileType.KOTLIN
     private lateinit var templatePanel: JPanel
@@ -67,9 +68,9 @@ class CodePanel(private val project: Project) : JPanel() {
                 add(androidManifestTemplateTextField)
             }
 
-    fun show(fileType: FileType) {
+    fun show(fileTypeDescription: FileTypeDescription) {
         textFieldsMap[currentFileType]?.forEach { it.isVisible = false }
-        currentFileType = fileType
+        currentFileType = fileTypeDescription.description
         textFieldsMap[currentFileType]?.forEach { it.isVisible = true }
     }
 
