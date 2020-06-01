@@ -30,7 +30,7 @@ class CodePanel(private val project: Project) : JPanel() {
             FileType.KOTLIN to listOf(kotlinTemplateTextField, kotlinSampleTextField),
             FileType.XML to listOf(xmlTemplateTextField, xmlSampleTextField),
             FileType.GRADLE to listOf(gradleTemplateTextField, gradleSampleTextField),
-            FileType.GITIGNORE to listOf(androidManifestTemplateTextField, androidManifestSampleTextField)
+            FileType.GITIGNORE to listOf(kotlinTemplateTextField, kotlinSampleTextField)
     )
     private var currentFileType = FileType.KOTLIN
     private lateinit var templatePanel: JPanel

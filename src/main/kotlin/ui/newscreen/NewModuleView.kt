@@ -1,6 +1,6 @@
 package ui.newscreen
 
-interface NewScreenView {
+interface NewModuleView {
 
     fun close()
     fun showPackage(packageName: String)

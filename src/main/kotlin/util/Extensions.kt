@@ -1,9 +1,14 @@
 package util
 
 import com.intellij.ui.LanguageTextField
+import model.Variable
 import javax.swing.JTextField
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
+
+const val DEFAULT_PACKAGE = "sample.touchin.com"
+const val DEFAULT_FEATURE_MODULE_NAME = "feature_sample"
+const val DEFAULT_FEATURE_NAME = "sample"
 
 fun JTextField.addTextChangeListener(onChange: (String) -> Unit) =
         object : DocumentListener {
@@ -24,3 +29,14 @@ fun <T> MutableList<T>.swap(index1: Int, index2: Int) {
     this[index1] = this[index2]
     this[index2] = temp
 }
+
+fun String.replaceVariables(featureName: String, featureModuleName: String, packageName: String) =
+        replace(Variable.NAME.value, featureName.capitalize())
+                .replace(Variable.NAME_SNAKE_CASE.value, featureName.toSnakeCase())
+                .replace(Variable.NAME_LOWER_CASE.value, featureName.decapitalize())
+                .replace(Variable.FEATURE_MODULE_NAME.value, featureModuleName)
+                .replace(Variable.MODULE_PACKAGE.value, packageName)
+
+
+fun String.replaceVariablesDefault() =
+        replaceVariables(DEFAULT_FEATURE_NAME, DEFAULT_FEATURE_MODULE_NAME, DEFAULT_PACKAGE)

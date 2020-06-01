@@ -13,23 +13,23 @@ import com.intellij.openapi.ui.DialogWrapper
 import data.file.FileCreatorImpl
 import data.file.WriteActionDispatcherImpl
 import data.repository.SettingsRepositoryImpl
-import model.AndroidComponent
+import model.ModuleTypes
 import org.gradle.cli.CommandLineArgumentException
 import org.jetbrains.plugins.gradle.util.GradleConstants
 import java.util.*
 import javax.swing.JComponent
 
 
-class NewScreenDialog(val project: Project, val selectedFolder: String?) : DialogWrapper(true), NewScreenView {
+class NewModuleDialog(val project: Project, val selectedFolder: String?) : DialogWrapper(true), NewModuleView {
 
-    private val panel = NewScreenPanel()
+    private val panel = NewModulePanel()
 
-    private val presenter: NewScreenPresenter
+    private val presenter: NewModulePresenter
 
     init {
         val fileCreator = FileCreatorImpl(SettingsRepositoryImpl(project))
         val writeActionDispatcher = WriteActionDispatcherImpl()
-        presenter = NewScreenPresenter(this, fileCreator, writeActionDispatcher)
+        presenter = NewModulePresenter(this, fileCreator, writeActionDispatcher)
         init()
     }
 
@@ -37,14 +37,14 @@ class NewScreenDialog(val project: Project, val selectedFolder: String?) : Dialo
         presenter.onOkClick(
                 panel.packageTextField.text,
                 panel.featureNameTextField.text,
-                AndroidComponent.values()[panel.androidComponentComboBox.selectedIndex],
+                ModuleTypes.values()[panel.moduleTypeComboBox.selectedIndex],
                 selectedFolder ?: "")
         Timer("SyncGradle", false).schedule(object : TimerTask() {
             override fun run() {
                 runGradle("build", project.basePath ?: "")
 
             }
-        }, NewScreenPresenter.DELAY_GRADLE_SYNC)
+        }, NewModulePresenter.DELAY_GRADLE_SYNC)
     }
 
 

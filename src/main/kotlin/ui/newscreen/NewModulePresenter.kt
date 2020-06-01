@@ -2,12 +2,12 @@ package ui.newscreen
 
 import data.file.FileCreator
 import data.file.WriteActionDispatcher
-import model.AndroidComponent
+import model.ModuleTypes
 import org.jetbrains.kotlin.utils.addToStdlib.firstNotNullResult
 import java.io.File
 
-class NewScreenPresenter(
-        private val view: NewScreenView,
+class NewModulePresenter(
+        private val view: NewModuleView,
         private val fileCreator: FileCreator,
         private val writeActionDispatcher: WriteActionDispatcher
 ) {
@@ -45,9 +45,9 @@ class NewScreenPresenter(
         }.firstNotNullResult { it } ?: "com.touchin.sample"
     }
 
-    fun onOkClick(packageName: String, featureName: String, androidComponent: AndroidComponent, rootDirectory: String) {
+    fun onOkClick(packageName: String, featureName: String, moduleTypes: ModuleTypes, rootDirectory: String) {
         writeActionDispatcher.dispatch {
-            fileCreator.createScreenFiles(packageName, featureName, androidComponent, rootDirectory)
+            fileCreator.createScreenFiles(packageName, featureName, moduleTypes, rootDirectory)
         }
         view.close()
     }

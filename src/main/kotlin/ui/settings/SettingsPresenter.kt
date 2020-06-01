@@ -2,11 +2,8 @@ package ui.settings
 
 import data.repository.SettingsRepository
 import model.*
+import util.replaceVariablesDefault
 import util.swap
-
-const val SAMPLE_SCREEN_NAME = "Sample"
-const val SAMPLE_PACKAGE_NAME = "com.sample.touch"
-const val SAMPLE_ANDROID_COMPONENT = "Activity"
 
 class SettingsPresenter(private val view: SettingsView,
                         private val settingsRepository: SettingsRepository) {
@@ -15,16 +12,12 @@ class SettingsPresenter(private val view: SettingsView,
     var currentSelectedScreenElement: ScreenElement? = null
     var isModified = false
     lateinit var initialSettings: Settings
-    lateinit var currentActivityBaseClass: String
-    lateinit var currentFragmentBaseClass: String
 
     fun onLoadView() {
         initialSettings = settingsRepository.loadSettings()
         resetToInitialSettings()
         view.setUpListeners()
         view.showScreenElements(screenElements)
-        view.showActivityBaseClass(currentActivityBaseClass)
-        view.showFragmentBaseClass(currentFragmentBaseClass)
         view.addBaseClassTextChangeListeners()
     }
 
@@ -33,8 +26,6 @@ class SettingsPresenter(private val view: SettingsView,
     private fun resetToInitialSettings() {
         screenElements.clear()
         initialSettings.screenElements.mapTo(screenElements) { it.copy() }
-        currentActivityBaseClass = initialSettings.activityBaseClass
-        currentFragmentBaseClass = initialSettings.fragmentBaseClass
     }
 
     fun onAddClick() {
@@ -56,18 +47,17 @@ class SettingsPresenter(private val view: SettingsView,
             val selectedElement = screenElements[index]
             currentSelectedScreenElement = selectedElement
             view.removeTextChangeListeners()
-            view.showName(selectedElement.name)
+            view.showPath(selectedElement.path)
             view.showFileTypeDescription(selectedElement.toFileTypeDescription())
             handleFileTypeSelection(selectedElement, false)
             view.showTemplate(selectedElement.template)
             updateSampleCode(selectedElement)
             view.addTextChangeListeners()
             view.setScreenElementDetailsEnabled(true)
-            setBaseAndroidFilesFieldPrefs(selectedElement)
         } else {
             currentSelectedScreenElement = null
             view.removeTextChangeListeners()
-            view.showName("")
+            view.showPath("")
             view.showTemplate("")
             view.showSampleCode("")
             view.showFileNameTemplate("")
@@ -76,24 +66,21 @@ class SettingsPresenter(private val view: SettingsView,
         }
     }
 
-    fun onNameChange(name: String) {
+    fun onPathChange(path: String) {
         currentSelectedScreenElement?.let {
-            it.name = name
-            view.updateScreenElement(screenElements.indexOf(it), it)
-            updateSampleCode(it)
-            updateSampleFileName(it)
+            it.path = path
             isModified = true
         }
     }
 
     private fun updateSampleFileName(screenElement: ScreenElement) {
-        val fileName = screenElement.name
+        val fileName = screenElement.name.replaceVariablesDefault()
         val fileExtension = screenElement.fileType.extension
         view.showFileNameSample("$fileName.$fileExtension")
     }
 
     fun onApplySettings() {
-        initialSettings = Settings(screenElements.toMutableList(), currentActivityBaseClass, currentFragmentBaseClass)
+        initialSettings = Settings(screenElements.toMutableList())
         resetToInitialSettings()
         settingsRepository.update(initialSettings)
         isModified = false
@@ -104,8 +91,6 @@ class SettingsPresenter(private val view: SettingsView,
         view.clearScreenElements()
         view.showScreenElements(screenElements)
         view.removeBaseClassTextChangeListeners()
-        view.showActivityBaseClass(currentActivityBaseClass)
-        view.showFragmentBaseClass(currentFragmentBaseClass)
         view.addBaseClassTextChangeListeners()
         isModified = false
     }
@@ -131,10 +116,9 @@ class SettingsPresenter(private val view: SettingsView,
     }
 
     private fun updateSampleCode(screenElement: ScreenElement) =
-            view.showSampleCode(screenElement.template)
+            view.showSampleCode(screenElement.template.replaceVariablesDefault())
 
     fun onActivityBaseClassChange(text: String) {
-        currentActivityBaseClass = text
         currentSelectedScreenElement?.let {
             updateSampleCode(it)
             updateSampleFileName(it)
@@ -143,7 +127,6 @@ class SettingsPresenter(private val view: SettingsView,
     }
 
     fun onFragmentBaseClassChange(text: String) {
-        currentFragmentBaseClass = text
         currentSelectedScreenElement?.let {
             updateSampleCode(it)
             updateSampleFileName(it)
@@ -171,19 +154,14 @@ class SettingsPresenter(private val view: SettingsView,
         }
         view.showFileNameTemplate(screenElement.fileNameTemplate)
         updateSampleFileName(screenElement)
-        setBaseAndroidFilesFieldPrefs(screenElement)
-    }
-
-    fun setBaseAndroidFilesFieldPrefs(screenElement: ScreenElement) {
-        when (screenElement.fileType) {
-            FileType.GRADLE, FileType.GITIGNORE -> view.setFileNameUnchangeable(screenElement.fileType.name)
-        }
     }
 
     fun onFileNameChange(fileName: String) {
         currentSelectedScreenElement?.let { screenElement ->
-            setBaseAndroidFilesFieldPrefs(screenElement)
             screenElement.fileNameTemplate = fileName
+            screenElement.name = fileName
+            view.updateScreenElement(screenElements.indexOf(screenElement), screenElement)
+            updateSampleCode(screenElement)
             updateSampleFileName(screenElement)
             isModified = true
         }

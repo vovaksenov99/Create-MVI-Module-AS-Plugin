@@ -7,7 +7,7 @@ interface SettingsView {
     fun setUpListeners()
     fun addScreenElement(screenElement: ScreenElement)
     fun selectScreenElement(index: Int)
-    fun showName(name: String)
+    fun showPath(name: String)
     fun addTextChangeListeners()
     fun removeTextChangeListeners()
     fun updateScreenElement(index: Int, screenElement: ScreenElement)
@@ -16,8 +16,6 @@ interface SettingsView {
     fun clearScreenElements()
     fun showSampleCode(text: String)
     fun showTemplate(template: String)
-    fun showActivityBaseClass(text: String)
-    fun showFragmentBaseClass(text: String)
     fun addBaseClassTextChangeListeners()
     fun removeBaseClassTextChangeListeners()
     fun showFileTypeDescription(fileTypeDescription: FileTypeDescription)
@@ -30,5 +28,4 @@ interface SettingsView {
     fun swapToGradleTemplateListener(addListener: Boolean)
     fun swapToAndroidManifestTemplateListener(addListener: Boolean)
     fun setScreenElementDetailsEnabled(isEnabled: Boolean)
-    fun setFileNameUnchangeable(text: String = "")
 }

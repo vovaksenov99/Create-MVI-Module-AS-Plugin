@@ -2,9 +2,6 @@ package data.file
 
 data class FileTemplate(val name: String, val template: String, val defaultPath: String)
 
-val FEATURE_NAME = "%FEATURE_NAME%"
-val PACKAGE_PATH = "%MODULE_NAME%"
-
 val templates = listOf(
         FileTemplate(
                 name = ".gitignore",
@@ -67,7 +64,7 @@ val templates = listOf(
                 
                 }
                 """,
-                defaultPath = "src/main/$PACKAGE_PATH/$FEATURE_NAME/di"
+                defaultPath = "src/main/%packageName%/%featureModuleName%/di"
         ),
         FileTemplate(
                 name = "%screenName%Coordinator.kt",
@@ -78,7 +75,7 @@ val templates = listOf(
                     fun open(data: String)
                 }
                 """,
-                defaultPath = "src/main/$PACKAGE_PATH/$FEATURE_NAME/navigation"
+                defaultPath = "src/main/%packageName%/%featureModuleName%/navigation"
         ),
         FileTemplate(
                 name = "%screenName%Deps.kt",
@@ -91,7 +88,7 @@ val templates = listOf(
                     fun %screenNameLowerCase%Coordinator(): %screenName%Coordinator
                 }
                 """,
-                defaultPath = "src/main/$PACKAGE_PATH/$FEATURE_NAME"
+                defaultPath = "src/main/%packageName%/%featureModuleName%"
         ),
         FileTemplate(
                 name = "%screenName%Fragment.kt",
@@ -142,7 +139,7 @@ val templates = listOf(
                 
                 }
                 """,
-                defaultPath = "src/main/$PACKAGE_PATH/$FEATURE_NAME/presentation"
+                defaultPath = "src/main/%packageName%/%featureModuleName%/presentation"
         ),
         FileTemplate(
                 name = "%screenName%NavArgs.kt",
@@ -155,7 +152,7 @@ val templates = listOf(
                 @Parcelize
                 data class %screenName%NavArgs(): Parcelable
                 """,
-                defaultPath = "src/main/$PACKAGE_PATH/$FEATURE_NAME/presentation"
+                defaultPath = "src/main/%packageName%/%featureModuleName%/presentation"
         ),
         FileTemplate(
                 name = "%screenName%Repository.kt",
@@ -166,7 +163,7 @@ val templates = listOf(
                 
                 class %screenName%Repository @Inject constructor() {}
                 """,
-                defaultPath = "src/main/$PACKAGE_PATH/$FEATURE_NAME/data"
+                defaultPath = "src/main/%packageName%/%featureModuleName%/data"
         ),
         FileTemplate(
                 name = "%screenName%UseCase.kt",
@@ -180,7 +177,7 @@ val templates = listOf(
                         private val repository: %screenName%Repository
                 )
                 """,
-                defaultPath = "src/main/$PACKAGE_PATH/$FEATURE_NAME/domain"
+                defaultPath = "src/main/%packageName%/%featureModuleName%/domain"
         ),
         FileTemplate(
                 name = "%screenName%ViewAction.kt",
@@ -191,7 +188,7 @@ val templates = listOf(
                 
                 sealed class %screenName%ViewAction : ViewAction
                 """,
-                defaultPath = "src/main/$PACKAGE_PATH/$FEATURE_NAME/presentation"
+                defaultPath = "src/main/%packageName%/%featureModuleName%/presentation"
         ),
         FileTemplate(
                 name = "%screenName%ViewModel.kt",
@@ -229,7 +226,7 @@ val templates = listOf(
                 
                 }
                 """,
-                defaultPath = "src/main/$PACKAGE_PATH/$FEATURE_NAME/presentation"
+                defaultPath = "src/main/%packageName%/%featureModuleName%/presentation"
         ),
         FileTemplate(
                 name = "%screenName%ViewState.kt",
@@ -242,7 +239,7 @@ val templates = listOf(
                     object Default: %screenName%ViewState
                 }
                 """,
-                defaultPath = "src/main/$PACKAGE_PATH/$FEATURE_NAME/presentation"
+                defaultPath = "src/main/%packageName%/%featureModuleName%/presentation"
         ),
         FileTemplate(
                 name = "SomeModule.kt",
@@ -254,7 +251,7 @@ val templates = listOf(
                 @Module
                 abstract class SomeModule
                 """,
-                defaultPath = "src/main/$PACKAGE_PATH/$FEATURE_NAME/di"
+                defaultPath = "src/main/%packageName%/%featureModuleName%/di"
         ),
         FileTemplate(
                 name = "ViewModelModule.kt",
@@ -281,7 +278,7 @@ val templates = listOf(
                 
                 }
                 """,
-                defaultPath = "src/main/$PACKAGE_PATH/$FEATURE_NAME/di"
+                defaultPath = "src/main/%packageName%/%featureModuleName%/di"
         )
 
 

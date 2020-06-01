@@ -17,7 +17,7 @@ class SettingsViewImpl(private val project: Project) : Configurable, SettingsVie
 
     private var panel: SettingsPanel? = null
     private val presenter = SettingsPresenter(this, SettingsRepositoryImpl(project))
-    private var nameDocumentListener: DocumentListener? = null
+    private var filePathDocumentListener: DocumentListener? = null
     private var templateDocumentListener: com.intellij.openapi.editor.event.DocumentListener? = null
     private var activityDocumentListener: DocumentListener? = null
     private var fragmentDocumentListener: DocumentListener? = null
@@ -72,22 +72,22 @@ class SettingsViewImpl(private val project: Project) : Configurable, SettingsVie
         screenElementsList.selectedIndex = index
     }
 
-    override fun showName(name: String) = onPanel {
-        nameTextField.text = name
+    override fun showPath(path: String) = onPanel {
+        pathTextField.text = path
     }
 
     override fun addTextChangeListeners() = onPanel {
-        nameDocumentListener = nameTextField.addTextChangeListener(presenter::onNameChange)
         templateDocumentListener = currentTemplateTextField?.addTextChangeListener(presenter::onTemplateChange)
         fileNameDocumentListener = fileNameTextField.addTextChangeListener(presenter::onFileNameChange)
+        filePathDocumentListener = pathTextField.addTextChangeListener(presenter::onPathChange)
         fileTypeComboBox.addActionListener(fileTypeActionListener)
     }
 
     override fun removeTextChangeListeners() = onPanel {
-        nameDocumentListener?.let { nameTextField.document.removeDocumentListener(it) }
+        filePathDocumentListener?.let { pathTextField.document.removeDocumentListener(it) }
         templateDocumentListener?.let { currentTemplateTextField?.document?.removeDocumentListener(it) }
         fileNameDocumentListener?.let { fileNameTextField.document.removeDocumentListener(it) }
-        nameDocumentListener = null
+        filePathDocumentListener = null
         templateDocumentListener = null
         fileNameDocumentListener = null
         fileTypeComboBox.removeActionListener(fileTypeActionListener)
@@ -111,14 +111,6 @@ class SettingsViewImpl(private val project: Project) : Configurable, SettingsVie
 
     override fun showTemplate(template: String) {
         currentTemplateTextField?.text = template
-    }
-
-    override fun showActivityBaseClass(text: String) = onPanel {
-        activityTextField.text = text
-    }
-
-    override fun showFragmentBaseClass(text: String) = onPanel {
-        fragmentTextField.text = text
     }
 
     override fun addBaseClassTextChangeListeners() = onPanel {
@@ -178,8 +170,6 @@ class SettingsViewImpl(private val project: Project) : Configurable, SettingsVie
     override fun showHelp() = HelpDialog().show()
 
     override fun setScreenElementDetailsEnabled(isEnabled: Boolean) = onPanel { setScreenElementDetailsEnabled(isEnabled) }
-
-    override fun setFileNameUnchangeable(text: String) = onPanel { setFileNameUnchangeable(text) }
 
     private inline fun onPanel(function: SettingsPanel.() -> Unit) = panel?.run { function() } ?: Unit
 }

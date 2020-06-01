@@ -17,7 +17,7 @@ import javax.swing.ListSelectionModel
 
 class SettingsPanel(project: Project) : JPanel() {
 
-    val nameTextField = JTextField()
+    val pathTextField = JTextField()
 
     val screenElementsListModel = CollectionListModel<ScreenElement>()
     val screenElementsList = JBList<ScreenElement>(screenElementsListModel).apply {
@@ -35,7 +35,7 @@ class SettingsPanel(project: Project) : JPanel() {
     val codePanel = CodePanel(project)
 
     private lateinit var screenElementDetailsPanel: JPanel
-    private val screenElementNameLabel = JLabel("Element Name:")
+    private val pathLabel = JLabel("Path:")
     private val fileNameLabel = JLabel("File Name:")
     private val fileTypeLabel = JLabel("File Type:")
 
@@ -45,10 +45,9 @@ class SettingsPanel(project: Project) : JPanel() {
 
     fun create(onHelpClick: () -> Unit) {
         val screenElementsPanel = createScreenElementsPanel()
-        val androidComponentsPanel = createAndroidComponentsPanel()
         screenElementDetailsPanel = createScreenElementDetailsPanel()
 
-        val rightPanel = createSplitterRightPanel(androidComponentsPanel, screenElementDetailsPanel)
+        val rightPanel = createSplitterRightPanel(screenElementDetailsPanel)
 
         addSplitter(screenElementsPanel, rightPanel)
         addCodePanel(onHelpClick)
@@ -60,20 +59,11 @@ class SettingsPanel(project: Project) : JPanel() {
         add(toolbarDecorator.createPanel())
     }
 
-    private fun createAndroidComponentsPanel() = JPanel().apply {
-        border = IdeBorderFactory.createTitledBorder("Android Components", false)
-        layout = GridBagLayout()
-        add(JLabel("Activity Base Class:"), constraintsLeft(0, 0))
-        add(activityTextField, constraintsRight(1, 0))
-        add(JLabel("Fragment Base Class:"), constraintsLeft(0, 1))
-        add(fragmentTextField, constraintsRight(1, 1))
-    }
-
     private fun createScreenElementDetailsPanel() = JPanel().apply {
         border = IdeBorderFactory.createTitledBorder("Element Details", false)
         layout = GridBagLayout()
-        add(screenElementNameLabel, constraintsLeft(0, 0))
-        add(nameTextField, constraintsRight(1, 0))
+        add(pathLabel, constraintsLeft(0, 0))
+        add(pathTextField, constraintsRight(1, 0))
         add(fileNameLabel, constraintsLeft(0, 1))
         add(fileNameTextField, constraintsRight(1, 1))
         add(fileTypeLabel, constraintsLeft(0, 2))
@@ -113,9 +103,8 @@ class SettingsPanel(project: Project) : JPanel() {
         }, BorderLayout.PAGE_START)
     }
 
-    private fun createSplitterRightPanel(androidComponentsPanel: JPanel, screenElementDetailsPanel: JPanel) =
+    private fun createSplitterRightPanel(screenElementDetailsPanel: JPanel) =
             JPanel(GridLayout(0, 1)).apply {
-                add(androidComponentsPanel)
                 add(screenElementDetailsPanel)
             }
 
@@ -124,18 +113,12 @@ class SettingsPanel(project: Project) : JPanel() {
         add(codePanel, BorderLayout.CENTER)
     }
 
-    fun setFileNameUnchangeable(text: String = "") {
-        nameTextField.text = text
-        nameTextField.isEnabled = false
-        fileNameTextField.isEnabled = false
-    }
-
     fun setScreenElementDetailsEnabled(isEnabled: Boolean) {
         screenElementDetailsPanel.isEnabled = isEnabled
-        nameTextField.isEnabled = isEnabled
+        pathTextField.isEnabled = isEnabled
         fileNameTextField.isEnabled = isEnabled
         fileTypeComboBox.isEnabled = isEnabled
-        screenElementNameLabel.isEnabled = isEnabled
+        pathLabel.isEnabled = isEnabled
         fileNameLabel.isEnabled = isEnabled
         fileTypeLabel.isEnabled = isEnabled
         codePanel.setCodePanelsEnabled(isEnabled)

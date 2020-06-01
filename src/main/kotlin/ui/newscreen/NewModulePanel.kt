@@ -1,7 +1,7 @@
 package ui.newscreen
 
 import com.intellij.openapi.ui.ComboBox
-import model.AndroidComponent
+import model.ModuleTypes
 import java.awt.Dimension
 import java.awt.GridLayout
 import javax.swing.JLabel
@@ -9,12 +9,12 @@ import javax.swing.JPanel
 import javax.swing.JTextField
 
 
-class NewScreenPanel : JPanel() {
+class NewModulePanel : JPanel() {
 
     val featureNameTextField = JTextField()
     val packageTextField = JTextField()
 
-    val androidComponentComboBox = ComboBox(AndroidComponent.values())
+    val moduleTypeComboBox = ComboBox(ModuleTypes.values())
 
     init {
         layout = GridLayout(0, 2)
@@ -22,9 +22,9 @@ class NewScreenPanel : JPanel() {
         add(packageTextField)
         add(JLabel("Feature name:"))
         add(featureNameTextField)
-        add(JLabel("Android Component:"))
-        add(androidComponentComboBox)
+        add(JLabel("Module type:"))
+        add(moduleTypeComboBox)
     }
 
-    override fun getPreferredSize() = Dimension(350, 110)
+    override fun getPreferredSize() = Dimension(400, 110)
 }

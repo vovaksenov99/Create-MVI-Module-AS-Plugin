@@ -31,16 +31,17 @@
         <projectConfigurable
                 instance="ui.settings.SettingsViewImpl">
         </projectConfigurable>
-        <projectService serviceInterface="data.ModuleGeneratorComponent" serviceImplementation="data.ModuleGeneratorComponent"/>
+        <projectService serviceInterface="data.ModuleGeneratorComponent"
+                        serviceImplementation="data.ModuleGeneratorComponent"/>
     </extensions>
 
     <actions>
         <group id="ScreenGenerator.FileMenu"
                text="Add new module">
             <add-to-group group-id="NewGroup" anchor="last"/>
-            <separator />
+            <separator/>
             <action id="NewScreenAction"
-                    class="ui.newscreen.NewScreenAction"
+                    class="ui.newscreen.NewModuleAction"
                     text="Add new module"
                     description="Module Generator Plugin"/>
         </group>
