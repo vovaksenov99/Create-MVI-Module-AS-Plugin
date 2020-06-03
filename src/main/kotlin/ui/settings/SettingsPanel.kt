@@ -8,6 +8,7 @@ import com.intellij.ui.JBSplitter
 import com.intellij.ui.ToolbarDecorator
 import com.intellij.ui.components.JBList
 import model.FileType
+import model.ModuleType
 import model.ScreenElement
 import java.awt.*
 import javax.swing.JLabel
@@ -20,15 +21,13 @@ class SettingsPanel(project: Project) : JPanel() {
     val pathTextField = JTextField()
 
     val screenElementsListModel = CollectionListModel<ScreenElement>()
-    val screenElementsList = JBList<ScreenElement>(screenElementsListModel).apply {
+    val screenElementsList = JBList(screenElementsListModel).apply {
         selectionMode = ListSelectionModel.SINGLE_SELECTION
     }
     val toolbarDecorator: ToolbarDecorator = ToolbarDecorator.createDecorator(screenElementsList)
 
-    val activityTextField = JTextField()
-    val fragmentTextField = JTextField()
-
-    val fileTypeComboBox = ComboBox<FileType>(FileType.values())
+    val fileTypeComboBox = ComboBox(FileType.values())
+    val moduleTypeComboBox = ComboBox(ModuleType.values())
     val fileNameTextField = JTextField()
     val fileNameSampleLabel = JLabel().apply { isEnabled = false }
 
@@ -55,8 +54,21 @@ class SettingsPanel(project: Project) : JPanel() {
 
     private fun createScreenElementsPanel() = JPanel().apply {
         border = IdeBorderFactory.createTitledBorder("Elements", false)
-        layout = GridLayout(1, 1)
-        add(toolbarDecorator.createPanel())
+        layout = GridBagLayout().apply {
+        }
+        add(moduleTypeComboBox, GridBagConstraints().apply {
+            fill = GridBagConstraints.HORIZONTAL
+            weightx = 1.0
+            weighty = 0.0
+            gridy = 0
+        })
+        add(toolbarDecorator.createPanel().apply {
+        }, GridBagConstraints().apply {
+            fill = GridBagConstraints.BOTH
+            gridy = 1
+            weightx = 1.0
+            weighty = 1.0
+        })
     }
 
     private fun createScreenElementDetailsPanel() = JPanel().apply {
@@ -97,7 +109,7 @@ class SettingsPanel(project: Project) : JPanel() {
     }
 
     private fun addSplitter(leftPanel: JPanel, rightPanel: JPanel) {
-        add(JBSplitter(0.2f).apply {
+        add(JBSplitter(0.3f).apply {
             firstComponent = leftPanel
             secondComponent = rightPanel
         }, BorderLayout.PAGE_START)

@@ -1,7 +1,7 @@
 package ui.newscreen
 
 import com.intellij.openapi.ui.ComboBox
-import model.ModuleTypes
+import model.ModuleType
 import java.awt.Dimension
 import java.awt.GridLayout
 import javax.swing.JLabel
@@ -14,7 +14,7 @@ class NewModulePanel : JPanel() {
     val featureNameTextField = JTextField()
     val packageTextField = JTextField()
 
-    val moduleTypeComboBox = ComboBox(ModuleTypes.values())
+    val moduleTypeComboBox = ComboBox(ModuleType.values())
 
     init {
         layout = GridLayout(0, 2)

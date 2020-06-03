@@ -13,7 +13,7 @@ import com.intellij.openapi.ui.DialogWrapper
 import data.file.FileCreatorImpl
 import data.file.WriteActionDispatcherImpl
 import data.repository.SettingsRepositoryImpl
-import model.ModuleTypes
+import model.ModuleType
 import org.gradle.cli.CommandLineArgumentException
 import org.jetbrains.plugins.gradle.util.GradleConstants
 import java.util.*
@@ -37,7 +37,7 @@ class NewModuleDialog(val project: Project, val selectedFolder: String?) : Dialo
         presenter.onOkClick(
                 panel.packageTextField.text,
                 panel.featureNameTextField.text,
-                ModuleTypes.values()[panel.moduleTypeComboBox.selectedIndex],
+                ModuleType.values()[panel.moduleTypeComboBox.selectedIndex],
                 selectedFolder ?: "")
         Timer("SyncGradle", false).schedule(object : TimerTask() {
             override fun run() {

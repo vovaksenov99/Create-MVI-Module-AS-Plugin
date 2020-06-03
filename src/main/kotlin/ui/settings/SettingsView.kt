@@ -16,8 +16,6 @@ interface SettingsView {
     fun clearScreenElements()
     fun showSampleCode(text: String)
     fun showTemplate(template: String)
-    fun addBaseClassTextChangeListeners()
-    fun removeBaseClassTextChangeListeners()
     fun showFileTypeDescription(fileTypeDescription: FileTypeDescription)
     fun showCodeTextFields(FileTypeDescription: FileTypeDescription)
     fun swapToKotlinTemplateListener(addListener: Boolean)

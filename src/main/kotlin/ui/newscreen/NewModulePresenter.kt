@@ -2,7 +2,7 @@ package ui.newscreen
 
 import data.file.FileCreator
 import data.file.WriteActionDispatcher
-import model.ModuleTypes
+import model.ModuleType
 import org.jetbrains.kotlin.utils.addToStdlib.firstNotNullResult
 import java.io.File
 
@@ -24,7 +24,7 @@ class NewModulePresenter(
 
     private fun checkPackageName(path: String): String? {
         var path = path
-        var rez = mutableListOf<String>()
+        val rez = mutableListOf<String>()
         if (File(path).exists()) {
             while (File(path).list()?.size == 1) {
                 val dir = File(path).listFiles()?.firstOrNull() ?: return null
@@ -45,9 +45,9 @@ class NewModulePresenter(
         }.firstNotNullResult { it } ?: "com.touchin.sample"
     }
 
-    fun onOkClick(packageName: String, featureName: String, moduleTypes: ModuleTypes, rootDirectory: String) {
+    fun onOkClick(packageName: String, featureName: String, moduleType: ModuleType, rootDirectory: String) {
         writeActionDispatcher.dispatch {
-            fileCreator.createScreenFiles(packageName, featureName, moduleTypes, rootDirectory)
+            fileCreator.createScreenFiles(packageName, featureName, moduleType, rootDirectory)
         }
         view.close()
     }

@@ -2,7 +2,7 @@ package data.file
 
 data class FileTemplate(val name: String, val template: String, val defaultPath: String)
 
-val templates = listOf(
+val featureTemplates = listOf(
         FileTemplate(
                 name = ".gitignore",
                 template = """
@@ -279,7 +279,25 @@ val templates = listOf(
                 }
                 """,
                 defaultPath = "src/main/%packageName%/%featureModuleName%/di"
+        ),
+        FileTemplate(
+                name = "libs",
+                template = "",
+                defaultPath = ""
         )
+)
 
-
+val testTemplates = listOf(
+        FileTemplate(
+                name = "AndroidManifest.xml",
+                template = """
+                <manifest>
+                """,
+                defaultPath = "src/main"
+        ),
+        FileTemplate(
+                name = "libs",
+                template = "",
+                defaultPath = "src/main"
+        )
 )

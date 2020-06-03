@@ -10,6 +10,7 @@ class SettingsPresenter(private val view: SettingsView,
 
     val screenElements = mutableListOf<ScreenElement>()
     var currentSelectedScreenElement: ScreenElement? = null
+    var currentSelectedModuleType: ModuleType = ModuleType.values().first()
     var isModified = false
     lateinit var initialSettings: Settings
 
@@ -18,19 +19,19 @@ class SettingsPresenter(private val view: SettingsView,
         resetToInitialSettings()
         view.setUpListeners()
         view.showScreenElements(screenElements)
-        view.addBaseClassTextChangeListeners()
     }
 
     fun onViewCreated() = view.setScreenElementDetailsEnabled(false)
 
     private fun resetToInitialSettings() {
         screenElements.clear()
-        initialSettings.screenElements.mapTo(screenElements) { it.copy() }
+        initialSettings.screenElements[currentSelectedModuleType]?.mapTo(screenElements) { it.copy() }
     }
 
     fun onAddClick() {
         val newScreenElement = ScreenElement.getDefault()
         screenElements.add(newScreenElement)
+        initialSettings.screenElements[currentSelectedModuleType] = screenElements.toMutableList()
         view.addScreenElement(newScreenElement)
         view.selectScreenElement(screenElements.size - 1)
         isModified = true
@@ -38,6 +39,7 @@ class SettingsPresenter(private val view: SettingsView,
 
     fun onDeleteClick(index: Int) {
         screenElements.removeAt(index)
+        initialSettings.screenElements[currentSelectedModuleType] = screenElements.toMutableList()
         view.removeScreenElement(index)
         isModified = true
     }
@@ -76,11 +78,14 @@ class SettingsPresenter(private val view: SettingsView,
     private fun updateSampleFileName(screenElement: ScreenElement) {
         val fileName = screenElement.name.replaceVariablesDefault()
         val fileExtension = screenElement.fileType.extension
-        view.showFileNameSample("$fileName.$fileExtension")
+        if (screenElement.fileType == FileType.FOLDER)
+            view.showFileNameSample("${screenElement.path}/$fileName")
+        else
+            view.showFileNameSample("$fileName.$fileExtension")
     }
 
     fun onApplySettings() {
-        initialSettings = Settings(screenElements.toMutableList())
+        initialSettings = Settings(initialSettings.screenElements)
         resetToInitialSettings()
         settingsRepository.update(initialSettings)
         isModified = false
@@ -90,8 +95,6 @@ class SettingsPresenter(private val view: SettingsView,
         resetToInitialSettings()
         view.clearScreenElements()
         view.showScreenElements(screenElements)
-        view.removeBaseClassTextChangeListeners()
-        view.addBaseClassTextChangeListeners()
         isModified = false
     }
 
@@ -118,30 +121,26 @@ class SettingsPresenter(private val view: SettingsView,
     private fun updateSampleCode(screenElement: ScreenElement) =
             view.showSampleCode(screenElement.template.replaceVariablesDefault())
 
-    fun onActivityBaseClassChange(text: String) {
+    fun onFileTypeSelect(fileType: FileType) {
+        val fileTypeDescription = FileTypeDescription(currentSelectedScreenElement?.name
+                ?: "", fileType, currentSelectedScreenElement?.template
+                ?: "", currentSelectedScreenElement?.fileNameTemplate ?: "", currentSelectedScreenElement?.path ?: "")
         currentSelectedScreenElement?.let {
-            updateSampleCode(it)
-            updateSampleFileName(it)
-        }
-        isModified = true
-    }
-
-    fun onFragmentBaseClassChange(text: String) {
-        currentSelectedScreenElement?.let {
-            updateSampleCode(it)
-            updateSampleFileName(it)
-        }
-        isModified = true
-    }
-
-    fun onFileTypeSelect(fileType: FileTypeDescription) {
-        currentSelectedScreenElement?.let {
-            it.fileType = fileType.description
+            it.fileType = fileTypeDescription.description
             it.fileNameTemplate = fileType.displayName
             handleFileTypeSelection(it, true)
-            view.showTemplate(fileType.defaultTemplate)
+            view.showTemplate(fileTypeDescription.defaultTemplate)
             isModified = true
         }
+    }
+
+    fun onModuleTypeSelect(moduleType: ModuleType) {
+        initialSettings.screenElements[currentSelectedModuleType] = screenElements.toMutableList()
+        currentSelectedModuleType = moduleType
+        resetToInitialSettings()
+        view.clearScreenElements()
+        view.showScreenElements(screenElements)
+        isModified = true
     }
 
     private fun handleFileTypeSelection(screenElement: ScreenElement, addListener: Boolean) {
