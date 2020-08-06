@@ -26,6 +26,15 @@ val featureTemplates = listOf(
                 }
                 
                 dependencies {
+                    dagger()
+                    mvi()
+                    constraintLayout()
+                    implementationModule(Module.Core.UI)
+                    coreStrings()
+                    coreNetwork()
+                    sharedPrefs()
+                    navigation()
+                    materialDesign()
                 }
                 """,
                 defaultPath = ""
@@ -48,47 +57,140 @@ val featureTemplates = listOf(
                 template = """
                 package %packageName%.%featureModuleName%.di
 
-                import dagger.Component
+                import android.content.Context
                 import %packageName%.%featureModuleName%.%screenName%Deps
+                import %packageName%.%featureModuleName%.flow.%screenName%FlowFragment
                 import %packageName%.%featureModuleName%.presentation.%screenName%Fragment
+                import dagger.BindsInstance
+                import dagger.Component
+                import ru.touchin.roboswag.navigation_base.scopes.FeatureScope
+                import ru.touchin.roboswag.navigation_cicerone.flow.FlowNavigationModule
                 
-                @Component(modules = [ViewModelModule::class, SomeModule::class], dependencies = [%screenName%Deps::class])
+                @FeatureScope
+                @Component(modules = [ViewModelModule::class, FlowNavigationModule::class, CoordinatorsModule::class, SomeModule::class], dependencies = [%screenName%Deps::class])
                 interface %screenName%Component {
                 
                     fun inject(fragment: %screenName%Fragment)
                 
+                    fun inject(fragment: %screenName%FlowFragment)
+                
                     @Component.Factory
                     interface Factory {
-                        fun create(deps: %screenName%Deps): %screenName%Component
+                        fun create(@BindsInstance context: Context, deps: %screenName%Deps): %screenName%Component
                     }
                 
                 }
                 """,
-                defaultPath = "src/main/%packageName%/%featureModuleName%/di"
+                defaultPath = "src/main/java/%packageName%/%featureModuleName%/di"
         ),
         FileTemplate(
-                name = "%screenName%Coordinator.kt",
+                name = "%screenName%CoordinatorImpl.kt",
                 template = """
                 package %packageName%.%featureModuleName%.navigation
                 
-                interface %screenName%Coordinator {
-                    fun open(data: String)
+                import %packageName%.%featureModuleName%.flow.%screenName%FlowCoordinator
+                import %packageName%.%featureModuleName%.presentation.%screenName%Coordinator
+                import javax.inject.Inject
+                
+                class %screenName%CoordinatorImpl @Inject constructor(
+                        private val %screenNameLowerCase%FlowCoordinator: %screenName%FlowCoordinator
+                ): %screenName%Coordinator {
+                
+                    override fun exit() {
+                        %screenNameLowerCase%FlowCoordinator.exit()
+                    }
+                
                 }
                 """,
-                defaultPath = "src/main/%packageName%/%featureModuleName%/navigation"
+                defaultPath = "src/main/java/%packageName%/%featureModuleName%/navigation"
+        ),
+        FileTemplate(
+                name = "Screens.kt",
+                template = """
+                package %packageName%.%featureModuleName%.navigation
+                
+                import androidx.fragment.app.Fragment
+                import %packageName%.%featureModuleName%.presentation.%screenName%Fragment
+                import ru.terrakok.cicerone.android.support.SupportAppScreen
+                
+                object Screens {
+                
+                    class %screenName% : SupportAppScreen() {
+                        override fun getFragment(): Fragment = %screenName%Fragment()
+                    }
+                
+                }
+                """,
+                defaultPath = "src/main/java/%packageName%/%featureModuleName%/navigation"
+        ),
+        FileTemplate(
+                name = "%screenName%FlowCoordinator.kt",
+                template = """
+                package %packageName%.%featureModuleName%.flow
+                
+                interface %screenName%FlowCoordinator {
+                    fun exit()
+                }
+                """,
+                defaultPath = "src/main/java/%packageName%/%featureModuleName%/flow"
+        ),
+        FileTemplate(
+                name = "%screenName%FlowFragment.kt",
+                template = """
+                package %packageName%.%featureModuleName%.flow
+                        
+                import %packageName%.%featureModuleName%.di.Dagger%screenName%Component
+                import %packageName%.%featureModuleName%.di.%screenName%Component
+                import %packageName%.%featureModuleName%.navigation.Screens
+                import me.vponomarenko.injectionmanager.IHasComponent
+                import me.vponomarenko.injectionmanager.x.XInjectionManager
+                import ru.terrakok.cicerone.android.support.SupportAppScreen
+                import ru.touchin.roboswag.navigation_cicerone.flow.FlowFragment
+                
+                class %screenName%FlowFragment : FlowFragment(), IHasComponent<%screenName%Component> {
+                
+                        override fun injectComponent() {
+                                XInjectionManager.bindComponent(this).inject(this)
+                        }
+                        
+                        override fun getLaunchScreen(): SupportAppScreen {
+                                return Screens.%screenName%()
+                        }
+                        
+                        override fun getComponent(): %screenName%Component {
+                                return Dagger%screenName%Component
+                                        .factory()
+                                        .create(requireContext(), XInjectionManager.findComponent())
+                        }
+                        
+                }
+
+                """,
+                defaultPath = "src/main/java/%packageName%/%featureModuleName%/flow"
         ),
         FileTemplate(
                 name = "%screenName%Deps.kt",
                 template = """
                 package %packageName%.%featureModuleName%
                 
-                import %packageName%.%featureModuleName%.navigation.%screenName%Coordinator
-                
+                import %packageName%.%featureModuleName%.flow.%screenName%FlowCoordinator
+
                 interface %screenName%Deps {
-                    fun %screenNameLowerCase%Coordinator(): %screenName%Coordinator
+                    fun %screenNameLowerCase%FlowCoordinator(): %screenName%FlowCoordinator
                 }
                 """,
-                defaultPath = "src/main/%packageName%/%featureModuleName%"
+                defaultPath = "src/main/java/%packageName%/%featureModuleName%"
+        ),
+        FileTemplate(
+                name = "%screenName%Coordinator.kt",
+                template = """
+                package %packageName%.%featureModuleName%.presentation
+                
+                interface %screenName%Coordinator {
+                    fun exit()
+                }
+                """,
+                defaultPath = "src/main/java/%packageName%/%featureModuleName%/presentation"
         ),
         FileTemplate(
                 name = "%screenName%Fragment.kt",
@@ -96,63 +198,33 @@ val featureTemplates = listOf(
                 package %packageName%.%featureModuleName%.presentation
                 
                 import android.os.Bundle
-                import android.view.LayoutInflater
-                import android.view.ViewGroup
-                import me.vponomarenko.injectionmanager.IHasComponent
-                import me.vponomarenko.injectionmanager.x.XInjectionManager
-                import ru.touchin.mvi_arch.core.MviFragment
+                import %packageName%.%featureModuleName%.R
                 import %packageName%.%featureModuleName%.databinding.Fragment%screenName%Binding
-                import %packageName%.%featureModuleName%.di.Dagger%screenName%Component
                 import %packageName%.%featureModuleName%.di.%screenName%Component
+                import me.vponomarenko.injectionmanager.x.XInjectionManager
+                import ru.touchin.roboswag.mvi_arch.core.MviFragment
+                import ru.touchin.roboswag.navigation_base.fragments.EmptyState
+                import ru.touchin.roboswag.navigation_base.fragments.viewBinding
                 
-                class %screenName%Fragment(navArgs: %screenName%NavArgs) :
-                        MviFragment<Fragment%screenName%Binding, %screenName%NavArgs, %screenName%ViewState, %screenName%ViewAction, %screenName%ViewModel>(navArgs),
-                        IHasComponent<%screenName%Component> {
+                class %screenName%Fragment : MviFragment<EmptyState, %screenName%ViewState, %screenName%ViewAction, %screenName%ViewModel>(R.layout.fragment_%screenNameSnakeCase%) {
+                
+                    private val binding by viewBinding(Fragment%screenName%Binding::bind)
                 
                     override val viewModel: %screenName%ViewModel by viewModel()
                 
                     override fun onCreate(savedInstanceState: Bundle?) {
                         super.onCreate(savedInstanceState)
-                
                         injectDependencies()
                     }
                 
-                    override fun createViewBinding(inflater: LayoutInflater, container: ViewGroup?): Fragment%screenName%Binding =
-                            Fragment%screenName%Binding.inflate(inflater, container, false)
-                
-                    override fun onViewCreated(binding: Fragment%screenName%Binding, savedInstanceState: Bundle?) {
-                
-                    }
-                
-                    override fun getComponent(): %screenName%Component = Dagger%screenName%Component
-                            .factory()
-                            .create(XInjectionManager.findComponent())
-                
-                    override fun renderState(viewState: %screenName%ViewState) {
-                
-                    }
-                
                     private fun injectDependencies() {
-                        XInjectionManager.bindComponent(this)
+                        XInjectionManager.findComponent<%screenName%Component>()
                                 .inject(this)
                     }
                 
                 }
                 """,
-                defaultPath = "src/main/%packageName%/%featureModuleName%/presentation"
-        ),
-        FileTemplate(
-                name = "%screenName%NavArgs.kt",
-                template = """
-                package %packageName%.%featureModuleName%.presentation
-                
-                import android.os.Parcelable
-                import kotlinx.android.parcel.Parcelize
-                
-                @Parcelize
-                data class %screenName%NavArgs(): Parcelable
-                """,
-                defaultPath = "src/main/%packageName%/%featureModuleName%/presentation"
+                defaultPath = "src/main/java/%packageName%/%featureModuleName%/presentation"
         ),
         FileTemplate(
                 name = "%screenName%Repository.kt",
@@ -163,7 +235,7 @@ val featureTemplates = listOf(
                 
                 class %screenName%Repository @Inject constructor() {}
                 """,
-                defaultPath = "src/main/%packageName%/%featureModuleName%/data"
+                defaultPath = "src/main/java/%packageName%/%featureModuleName%/data"
         ),
         FileTemplate(
                 name = "%screenName%UseCase.kt",
@@ -177,69 +249,64 @@ val featureTemplates = listOf(
                         private val repository: %screenName%Repository
                 )
                 """,
-                defaultPath = "src/main/%packageName%/%featureModuleName%/domain"
+                defaultPath = "src/main/java/%packageName%/%featureModuleName%/domain"
         ),
         FileTemplate(
                 name = "%screenName%ViewAction.kt",
                 template = """
                 package %packageName%.%featureModuleName%.presentation
                 
-                import ru.touchin.mvi_arch.core.ViewAction
+                import ru.touchin.roboswag.mvi_arch.marker.ViewAction
                 
                 sealed class %screenName%ViewAction : ViewAction
                 """,
-                defaultPath = "src/main/%packageName%/%featureModuleName%/presentation"
+                defaultPath = "src/main/java/%packageName%/%featureModuleName%/presentation"
         ),
         FileTemplate(
                 name = "%screenName%ViewModel.kt",
                 template = """
                 package %packageName%.%featureModuleName%.presentation
                 
-                import android.os.Parcelable
                 import androidx.lifecycle.SavedStateHandle
-                import androidx.lifecycle.viewModelScope
                 import com.squareup.inject.assisted.Assisted
                 import com.squareup.inject.assisted.AssistedInject
-                import kotlinx.coroutines.launch
-                import ru.touchin.mvi_arch.core.MviImplViewModel
-                import ru.touchin.mvi_arch.di.ViewModelAssistedFactory
-                import %packageName%.%featureModuleName%.domain.Get%screenName%UseCase
-                import %packageName%.%featureModuleName%.navigation.%screenName%Coordinator
+                import %packageName%.%featureModuleName%.domain.%screenName%UseCase
+                import ru.touchin.roboswag.mvi_arch.core.MviViewModel
+                import ru.touchin.roboswag.mvi_arch.di.ViewModelAssistedFactory
+                import ru.touchin.roboswag.navigation_base.fragments.EmptyState
                 
                 class %screenName%ViewModel @AssistedInject constructor(
                         @Assisted arg0: SavedStateHandle,
                         private val coordinator: %screenName%Coordinator,
-                        private val useCase: %screenName%UseCase
-                ) : MviImplViewModel<%screenName%NavArgs, %screenName%ViewAction, SideEffect, %screenName%ViewState>(
-                        initialState = %screenName%ViewState.Default,
-                        handle = arg0
-                ) {
+                        private val %screenNameLowerCase%UseCase: %screenName%UseCase
+                ) : MviViewModel<EmptyState, %screenName%ViewAction, %screenName%ViewState>(%screenName%ViewState(), arg0) {
                 
-                    init {
-                
+                    override fun dispatchAction(action: %screenName%ViewAction) {
+                        when (action) {
+                            
+                        }
                     }
                 
                     @AssistedInject.Factory
                     interface Factory : ViewModelAssistedFactory<%screenName%ViewModel>
                 
-                    sealed class SideEffect : ru.touchin.mvi_arch.core.SideEffect
-                
                 }
                 """,
-                defaultPath = "src/main/%packageName%/%featureModuleName%/presentation"
+                defaultPath = "src/main/java/%packageName%/%featureModuleName%/presentation"
         ),
         FileTemplate(
                 name = "%screenName%ViewState.kt",
                 template = """
                 package %packageName%.%featureModuleName%.presentation
                 
-                import ru.touchin.mvi_arch.core.ViewState
+                import ru.touchin.roboswag.mvi_arch.marker.ViewState
                 
-                sealed class %screenName%ViewState : ViewState {
-                    object Default: %screenName%ViewState
-                }
+                data class %screenName%ViewState(
+                        val isProgress: Boolean = false 
+                ) : ViewState
+                
                 """,
-                defaultPath = "src/main/%packageName%/%featureModuleName%/presentation"
+                defaultPath = "src/main/java/%packageName%/%featureModuleName%/presentation"
         ),
         FileTemplate(
                 name = "SomeModule.kt",
@@ -251,7 +318,27 @@ val featureTemplates = listOf(
                 @Module
                 abstract class SomeModule
                 """,
-                defaultPath = "src/main/%packageName%/%featureModuleName%/di"
+                defaultPath = "src/main/java/%packageName%/%featureModuleName%/di"
+        ),
+        FileTemplate(
+                name = "CoordinatorsModule.kt",
+                template = """
+                package %packageName%.%featureModuleName%.di
+                
+                import %packageName%.%featureModuleName%.navigation.%screenName%CoordinatorImpl
+                import %packageName%.%featureModuleName%.presentation.%screenName%Coordinator
+                import dagger.Binds
+                import dagger.Module
+                
+                @Module
+                abstract class CoordinatorsModule {
+                
+                        @Binds
+                        abstract fun %screenNameLowerCase%Coordinator(impl: %screenName%CoordinatorImpl): %screenName%Coordinator
+                
+                }
+                """,
+                defaultPath = "src/main/java/%packageName%/%featureModuleName%/di"
         ),
         FileTemplate(
                 name = "ViewModelModule.kt",
@@ -260,15 +347,14 @@ val featureTemplates = listOf(
                 
                 import androidx.lifecycle.ViewModel
                 import com.squareup.inject.assisted.dagger2.AssistedModule
+                import %packageName%.%featureModuleName%.presentation.%screenName%ViewModel
                 import dagger.Binds
                 import dagger.Module
                 import dagger.multibindings.IntoMap
-                import ru.touchin.mvi_arch.di.ViewModelAssistedFactory
-                import ru.touchin.mvi_arch.di.ViewModelKey
-                import %packageName%.%featureModuleName%.presentation.%screenName%ViewModel
+                import ru.touchin.roboswag.mvi_arch.di.ViewModelAssistedFactory
+                import ru.touchin.roboswag.mvi_arch.di.ViewModelKey
                 
-                @AssistedModule
-                @Module(includes = [AssistedInject_ViewModelAssistedFactoriesModule::class])
+                @Module(includes = [ViewModelAssistedFactoriesModule::class])
                 interface ViewModelModule {
                 
                     @Binds
@@ -277,8 +363,12 @@ val featureTemplates = listOf(
                     fun bind%screenName%VMFactory(factory: %screenName%ViewModel.Factory): ViewModelAssistedFactory<out ViewModel>
                 
                 }
+                
+                @AssistedModule
+                @Module(includes = [AssistedInject_ViewModelAssistedFactoriesModule::class])
+                abstract class ViewModelAssistedFactoriesModule
                 """,
-                defaultPath = "src/main/%packageName%/%featureModuleName%/di"
+                defaultPath = "src/main/java/%packageName%/%featureModuleName%/di"
         ),
         FileTemplate(
                 name = "libs",

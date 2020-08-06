@@ -24,6 +24,10 @@ fun LanguageTextField.addTextChangeListener(onChange: (String) -> Unit) =
 
 fun String.toSnakeCase() = replace(Regex("([^_A-Z])([A-Z])"), "$1_$2").toLowerCase()
 
+fun String.toClassName() = this.split("_").joinToString(separator = "") { it.capitalize() }
+
+fun String.toMethodName() = this.toClassName().decapitalize()
+
 fun <T> MutableList<T>.swap(index1: Int, index2: Int) {
     val temp = this[index1]
     this[index1] = this[index2]
@@ -31,9 +35,9 @@ fun <T> MutableList<T>.swap(index1: Int, index2: Int) {
 }
 
 fun String.replaceVariables(featureName: String, featureModuleName: String, packageName: String) =
-        replace(Variable.NAME.value, featureName.capitalize())
+        replace(Variable.NAME.value, featureName.toClassName())
                 .replace(Variable.NAME_SNAKE_CASE.value, featureName.toSnakeCase())
-                .replace(Variable.NAME_LOWER_CASE.value, featureName.decapitalize())
+                .replace(Variable.NAME_LOWER_CASE.value, featureName.toMethodName())
                 .replace(Variable.FEATURE_MODULE_NAME.value, featureModuleName)
                 .replace(Variable.MODULE_PACKAGE.value, packageName)
 

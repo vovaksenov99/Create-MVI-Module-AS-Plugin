@@ -29,7 +29,6 @@ class FileCreatorImpl(private val settingsRepository: SettingsRepository) : File
                 if (file.description == FileType.FOLDER) {
                     File("${file.defaultPath}/${file.defaultFileName}/").mkdirs()
                 } else {
-
                     file.defaultTemplate = file.defaultTemplate.replaceVariables(featureName, featureModuleName, packageName)
                     file.displayName = file.displayName.replaceVariables(featureName, featureModuleName, packageName)
                     createFile(file)
